@@ -1,53 +1,68 @@
-
-function Sidebar() {
+function Sidebar({ setCurrentPage, currentPage }) {
   return (
     <aside className="sidebar">
 
+      {/* Logo */}
       <div className="sidebar-logo">
-        <div className="logo-icon">P</div>
-        <span>PulseAI</span>
+        <div className="logo-mark">P</div>
+        <h1>PulseAI</h1>
       </div>
 
+      {/* Navigation */}
       <nav className="sidebar-nav">
 
-        <p className="nav-label">MONITOR</p>
+        <p className="sidebar-label">MONITOR</p>
 
-        <button className="nav-item active">
-          <span>▣</span>
-          Dashboard
+        <button
+          className={`sidebar-link ${
+            currentPage === "dashboard" ? "active" : ""
+          }`}
+          onClick={() => setCurrentPage("dashboard")}
+        >
+          <span className="nav-icon">▦</span>
+          <span>Dashboard</span>
         </button>
 
-        <button className="nav-item">
-          <span>◈</span>
-          Projects
+        <button
+          className={`sidebar-link ${
+            currentPage === "services" ? "active" : ""
+          }`}
+          onClick={() => setCurrentPage("services")}
+        >
+          <span className="nav-icon">▣</span>
+          <span>Services</span>
         </button>
 
-        <button className="nav-item">
-          <span>◆</span>
-          Services
+        <button
+          className="sidebar-link"
+          onClick={() => setCurrentPage("endpoints")}
+        >
+          <span className="nav-icon">◇</span>
+          <span>Endpoints</span>
         </button>
 
-        <button className="nav-item">
-          <span>◇</span>
-          Endpoints
-        </button>
-
-        <button className="nav-item">
-          <span>◌</span>
-          Metrics
+        <button
+          className="sidebar-link"
+          onClick={() => setCurrentPage("metrics")}
+        >
+          <span className="nav-icon">◈</span>
+          <span>Metrics</span>
         </button>
 
       </nav>
 
+      {/* System status */}
       <div className="sidebar-bottom">
+
         <div className="system-status">
           <span className="status-dot"></span>
 
           <div>
-            <strong>System</strong>
-            <p>Operational</p>
+            <p>System</p>
+            <span>Operational</span>
           </div>
         </div>
+
       </div>
 
     </aside>
@@ -55,4 +70,8 @@ function Sidebar() {
 }
 
 export default Sidebar;
+
+
+
+
 
