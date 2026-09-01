@@ -54,6 +54,45 @@ def create_metric(
 
     return new_metric
 
+@router.get("/{endpoint_id}", response_model=list[MetricResponse])
+def get_endpoint_metrics(
+    endpoint_id: int,
+    minutes: int = Query(
+        60,
+        ge=1,
+        le=10080
+    ),
+    db: Session = Depends(get_db)
+):
+    # Check whether endpoint exists
+    endpoint = db.query(Endpoint).filter(
+        Endpoint.id == endpoint_id
+    ).first()
+
+    if not endpoint:
+        raise HTTPException(
+            status_code=404,
+            detail="Endpoint not found"
+        )
+
+    # Calculate start time
+    start_time = datetime.now(timezone.utc) - timedelta(
+        minutes=minutes
+    )
+
+    # Get metrics for this endpoint
+    metrics = (
+        db.query(RequestMetric)
+        .filter(
+            RequestMetric.endpoint_id == endpoint_id,
+            RequestMetric.timestamp >= start_time
+        )
+        .order_by(RequestMetric.timestamp.asc())
+        .all()
+    )
+
+    return metrics
+
 
 @router.get("/{endpoint_id}/stats")
 def get_endpoint_stats(

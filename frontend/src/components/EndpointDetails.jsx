@@ -1,38 +1,108 @@
 import { useEffect, useState } from "react";
 
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+} from "recharts";
+
 function EndpointDetails({
   endpointId,
   onBack,
 }) {
   const [stats, setStats] = useState(null);
+  const [metrics, setMetrics] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const chartData = metrics.map((metric) => ({
+  time: new Date(metric.timestamp).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  }),
+
+  latency: metric.latency_ms,
+}));
+
+  const statusData = [
+  {
+    name: "Successful",
+    value: metrics.filter(
+      (metric) =>
+        metric.status_code >= 200 &&
+        metric.status_code < 400
+    ).length,
+  },
+  {
+    name: "Client Errors",
+    value: metrics.filter(
+      (metric) =>
+        metric.status_code >= 400 &&
+        metric.status_code < 500
+    ).length,
+  },
+  {
+    name: "Server Errors",
+    value: metrics.filter(
+      (metric) =>
+        metric.status_code >= 500
+    ).length,
+  },
+].filter((item) => item.value > 0);
 
   useEffect(() => {
     setLoading(true);
     setError("");
 
-    fetch(
-      `http://127.0.0.1:8000/metrics/${endpointId}/stats?minutes=60`
-    )
-      .then((response) => {
+    Promise.all([
+      // Fetch aggregated statistics
+      fetch(
+        `http://127.0.0.1:8000/metrics/${endpointId}/stats?minutes=60`
+      ).then((response) => {
         if (!response.ok) {
-          throw new Error("Failed to fetch endpoint statistics");
+          throw new Error(
+            "Failed to fetch endpoint statistics"
+          );
         }
 
         return response.json();
-      })
-      .then((data) => {
-        setStats(data);
+      }),
+
+      // Fetch individual request metrics
+      fetch(
+        `http://127.0.0.1:8000/metrics/${endpointId}?minutes=60`
+      ).then((response) => {
+        if (!response.ok) {
+          throw new Error(
+            "Failed to fetch endpoint metrics"
+          );
+        }
+
+        return response.json();
+      }),
+    ])
+      .then(([statsData, metricsData]) => {
+        setStats(statsData);
+        setMetrics(metricsData);
       })
       .catch((error) => {
         console.error(
-          "Error fetching endpoint statistics:",
+          "Error fetching endpoint data:",
           error
         );
 
         setError(
-          "Unable to load endpoint statistics."
+          "Unable to load endpoint data."
         );
       })
       .finally(() => {
@@ -44,7 +114,7 @@ function EndpointDetails({
     return (
       <div className="endpoint-details-page">
         <div className="services-state">
-          Loading endpoint statistics...
+          Loading endpoint data...
         </div>
       </div>
     );
@@ -67,7 +137,9 @@ function EndpointDetails({
   return (
     <div className="endpoint-details-page">
 
-      {/* Header */}
+      {/* =========================
+          HEADER
+      ========================= */}
 
       <header className="endpoint-details-header">
 
@@ -91,6 +163,7 @@ function EndpointDetails({
             </div>
 
             <div>
+
               <h1>
                 Endpoint #{stats.endpoint_id}
               </h1>
@@ -98,6 +171,7 @@ function EndpointDetails({
               <p>
                 Request performance and health statistics
               </p>
+
             </div>
 
           </div>
@@ -107,16 +181,22 @@ function EndpointDetails({
       </header>
 
 
-      {/* Time Window */}
+      {/* =========================
+          TIME WINDOW
+      ========================= */}
 
       <div className="stats-window">
         Last {stats.time_window_minutes} minutes
       </div>
 
 
-      {/* Statistics */}
+      {/* =========================
+          STATISTICS
+      ========================= */}
 
       <section className="endpoint-stats-grid">
+
+        {/* Total Requests */}
 
         <div className="endpoint-stat-card">
 
@@ -134,6 +214,8 @@ function EndpointDetails({
 
         </div>
 
+
+        {/* Average Latency */}
 
         <div className="endpoint-stat-card">
 
@@ -153,6 +235,8 @@ function EndpointDetails({
         </div>
 
 
+        {/* Error Count */}
+
         <div className="endpoint-stat-card">
 
           <span className="endpoint-stat-label">
@@ -169,6 +253,8 @@ function EndpointDetails({
 
         </div>
 
+
+        {/* Error Rate */}
 
         <div className="endpoint-stat-card">
 
@@ -190,7 +276,9 @@ function EndpointDetails({
       </section>
 
 
-      {/* Health Summary */}
+      {/* =========================
+          HEALTH SUMMARY
+      ========================= */}
 
       <section className="endpoint-health-card">
 
@@ -227,6 +315,292 @@ function EndpointDetails({
         >
           <span></span>
         </div>
+
+      </section>
+
+      
+      <section className="latency-chart-card">
+
+        <div className="chart-header">
+
+          <div>
+            <span className="health-label">
+              PERFORMANCE
+            </span>
+
+            <h2>
+              Latency Over Time
+            </h2>
+
+            <p>
+              Response latency for requests in the selected time window.
+            </p>
+          </div>
+
+          <span className="chart-unit">
+            milliseconds
+          </span>
+
+        </div>
+
+
+        {chartData.length === 0 ? (
+
+          <div className="chart-empty">
+            No latency data available.
+          </div>
+
+        ) : (
+
+          <div className="latency-chart">
+
+            <ResponsiveContainer
+              width="100%"
+              height={320}
+            >
+
+              <LineChart
+                data={chartData}
+                margin={{
+                  top: 10,
+                  right: 20,
+                  left: 0,
+                  bottom: 10,
+                }}
+              >
+
+                <CartesianGrid
+                  stroke="#202020"
+                  strokeDasharray="3 3"
+                />
+
+                <XAxis
+                  dataKey="time"
+                  tick={{
+                    fill: "#666",
+                    fontSize: 10,
+                  }}
+                  tickLine={false}
+                  axisLine={{
+                    stroke: "#252525",
+                  }}
+                />
+
+                <YAxis
+                  tick={{
+                    fill: "#666",
+                    fontSize: 10,
+                  }}
+                  tickLine={false}
+                  axisLine={false}
+                  unit=" ms"
+                />
+
+                <Tooltip
+                  contentStyle={{
+                    background: "#0d0d0d",
+                    border: "1px solid #292929",
+                    borderRadius: "6px",
+                    color: "#eee",
+                    fontSize: "11px",
+                  }}
+                  labelStyle={{
+                    color: "#777",
+                  }}
+                  formatter={(value) => [
+                    `${value} ms`,
+                    "Latency",
+                  ]}
+                />
+
+                <Line
+                  type="monotone"
+                  dataKey="latency"
+                  stroke="#a855f7"
+                  strokeWidth={2}
+                  dot={false}
+                  activeDot={{
+                    r: 4,
+                  }}
+                />
+
+              </LineChart>
+
+            </ResponsiveContainer>
+
+          </div>
+
+        )}
+
+      </section>
+
+
+      <section className="status-chart-card">
+
+        <div className="chart-header">
+
+          <div>
+            <span className="health-label">
+              HTTP STATUS
+            </span>
+
+            <h2>
+              Request Status
+            </h2>
+
+            <p>
+              Distribution of successful and failed requests.
+            </p>
+          </div>
+
+        </div>
+
+
+        {statusData.length === 0 ? (
+
+          <div className="chart-empty">
+            No request status data available.
+          </div>
+
+        ) : (
+
+          <div className="status-chart">
+
+            <ResponsiveContainer
+              width="100%"
+              height={320}
+            >
+
+              <PieChart>
+
+                <Pie
+                  data={statusData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  innerRadius={60}
+                  paddingAngle={3}
+                >
+
+                  {statusData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={
+                        index === 0
+                          ? "#4ade80"
+                          : index === 1
+                          ? "#facc15"
+                          : "#ef4444"
+                      }
+                    />
+                  ))}
+
+                </Pie>
+
+                <Tooltip
+                  contentStyle={{
+                    background: "#0d0d0d",
+                    border: "1px solid #292929",
+                    borderRadius: "6px",
+                    color: "#eee",
+                    fontSize: "11px",
+                  }}
+                />
+
+                <Legend
+                  wrapperStyle={{
+                    fontSize: "10px",
+                    color: "#777",
+                  }}
+                />
+
+              </PieChart>
+
+            </ResponsiveContainer>
+
+          </div>
+
+        )}
+
+      </section>
+
+      {/* =========================
+          RECENT REQUESTS
+      ========================= */}
+
+      <section className="metrics-debug-card">
+
+        <div className="metrics-debug-header">
+
+          <div>
+
+            <span className="health-label">
+              RECENT REQUESTS
+            </span>
+
+            <h2>
+              Request Metrics
+            </h2>
+
+          </div>
+
+          <span className="metrics-count">
+            {metrics.length}{" "}
+            {metrics.length === 1
+              ? "request"
+              : "requests"}
+          </span>
+
+        </div>
+
+
+        {metrics.length === 0 ? (
+
+          <p className="metrics-empty">
+            No requests recorded in the last{" "}
+            {stats.time_window_minutes} minutes.
+          </p>
+
+        ) : (
+
+          <div className="metrics-list">
+
+            {metrics.map((metric) => (
+
+              <div
+                className="metric-row"
+                key={metric.id}
+              >
+
+                <span>
+                  {new Date(
+                    metric.timestamp
+                  ).toLocaleTimeString()}
+                </span>
+
+                <strong>
+                  {metric.latency_ms} ms
+                </strong>
+
+                <span
+                  className={
+                    metric.status_code >= 400
+                      ? "status-error"
+                      : "status-success"
+                  }
+                >
+                  {metric.status_code}
+                </span>
+
+              </div>
+
+            ))}
+
+          </div>
+
+        )}
 
       </section>
 
