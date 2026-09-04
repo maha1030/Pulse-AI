@@ -20,6 +20,7 @@ function EndpointDetails({
 }) {
   const [stats, setStats] = useState(null);
   const [metrics, setMetrics] = useState([]);
+  const [timeWindow, setTimeWindow] = useState(60);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -67,7 +68,7 @@ function EndpointDetails({
     Promise.all([
       // Fetch aggregated statistics
       fetch(
-        `http://127.0.0.1:8000/metrics/${endpointId}/stats?minutes=60`
+        `http://127.0.0.1:8000/metrics/${endpointId}/stats?minutes=${timeWindow}`
       ).then((response) => {
         if (!response.ok) {
           throw new Error(
@@ -80,7 +81,7 @@ function EndpointDetails({
 
       // Fetch individual request metrics
       fetch(
-        `http://127.0.0.1:8000/metrics/${endpointId}?minutes=60`
+        `http://127.0.0.1:8000/metrics/${endpointId}?minutes=${timeWindow}`
       ).then((response) => {
         if (!response.ok) {
           throw new Error(
@@ -108,7 +109,7 @@ function EndpointDetails({
       .finally(() => {
         setLoading(false);
       });
-  }, [endpointId]);
+  }, [endpointId, timeWindow]);
 
   if (loading) {
     return (
@@ -186,7 +187,43 @@ function EndpointDetails({
       ========================= */}
 
       <div className="stats-window">
-        Last {stats.time_window_minutes} minutes
+
+        <span>
+          Last {stats.time_window_minutes} minutes
+        </span>
+
+        <div className="time-window-buttons">
+
+          <button
+            className={timeWindow === 15 ? "active" : ""}
+            onClick={() => setTimeWindow(15)}
+          >
+            15m
+          </button>
+
+          <button
+            className={timeWindow === 60 ? "active" : ""}
+            onClick={() => setTimeWindow(60)}
+          >
+            1h
+          </button>
+
+          <button
+            className={timeWindow === 360 ? "active" : ""}
+            onClick={() => setTimeWindow(360)}
+          >
+            6h
+          </button>
+
+          <button
+            className={timeWindow === 1440 ? "active" : ""}
+            onClick={() => setTimeWindow(1440)}
+          >
+            24h
+          </button>
+
+        </div>
+
       </div>
 
 
@@ -230,6 +267,46 @@ function EndpointDetails({
 
           <p>
             Average response time
+          </p>
+
+        </div>
+
+
+        {/* P95 Latency */}
+
+        <div className="endpoint-stat-card">
+
+          <span className="endpoint-stat-label">
+            P95 Latency
+          </span>
+
+          <strong>
+            {stats.p95_latency_ms}
+            <small> ms</small>
+          </strong>
+
+          <p>
+            95% of requests are faster
+          </p>
+
+        </div>
+
+
+        {/* P99 Latency */}
+
+        <div className="endpoint-stat-card">
+
+          <span className="endpoint-stat-label">
+            P99 Latency
+          </span>
+
+          <strong>
+            {stats.p99_latency_ms}
+            <small> ms</small>
+          </strong>
+
+          <p>
+            99% of requests are faster
           </p>
 
         </div>

@@ -1,13 +1,29 @@
 
-function StatsCard({ title, value, unit }) {
+function StatsCard({ title, value, unit, description }) {
   return (
     <div className="stats-card">
-      <p className="stats-title">{title}</p>
+      <div className="stats-card-header">
+        <span className="stats-card-title">
+          {title}
+        </span>
 
-      <div className="stats-value">
-        <span>{value}</span>
-        <small>{unit}</small>
+        <span className="stats-card-icon">
+          +
+        </span>
       </div>
+
+      <div className="stats-card-value">
+        {value}
+        {unit && (
+          <span className="stats-card-unit">
+            {unit}
+          </span>
+        )}
+      </div>
+
+      <p className="stats-card-description">
+        {description}
+      </p>
     </div>
   );
 }

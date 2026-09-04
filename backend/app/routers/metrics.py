@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.database import SessionLocal
 from app.models import Endpoint, RequestMetric
 from app.schemas.metric import MetricCreate, MetricResponse
+import math
 
 
 router = APIRouter(
@@ -23,6 +24,24 @@ def get_db():
         yield db
     finally:
         db.close()
+        
+
+def calculate_percentile(values, percentile):
+    if not values:
+        return 0
+
+    values = sorted(values)
+
+    index = math.ceil(
+        (percentile / 100) * len(values)
+    ) - 1
+
+    index = max(
+        0,
+        min(index, len(values) - 1)
+    )
+
+    return values[index]
 
 
 @router.post("/", response_model=MetricResponse)
@@ -125,6 +144,23 @@ def get_endpoint_stats(
         RequestMetric.endpoint_id == endpoint_id,
         RequestMetric.timestamp >= start_time
     )
+    
+    # Get latency values
+    latency_values = [
+        metric.latency_ms
+        for metric in metrics.all()
+    ]
+
+    # Calculate P95 and P99
+    p95_latency = calculate_percentile(
+        latency_values,
+        95
+    )
+
+    p99_latency = calculate_percentile(
+        latency_values,
+        99
+    )
 
     # Total requests
     total_requests = metrics.with_entities(
@@ -150,17 +186,19 @@ def get_endpoint_stats(
         error_rate = 0
 
     return {
-        "endpoint_id": endpoint_id,
-        "time_window_minutes": minutes,
-        "total_requests": total_requests,
-        "average_latency_ms": round(
-            average_latency or 0,
-            2
-        ),
-        "error_count": error_count,
-        "error_rate": round(
-            error_rate,
-            2
-        )
-    }
+    "endpoint_id": endpoint_id,
+    "time_window_minutes": minutes,
+    "total_requests": total_requests,
+    "average_latency_ms": round(
+        average_latency or 0,
+        2
+    ),
+    "p95_latency_ms": p95_latency,
+    "p99_latency_ms": p99_latency,
+    "error_count": error_count,
+    "error_rate": round(
+        error_rate,
+        2
+    )
+}
 
