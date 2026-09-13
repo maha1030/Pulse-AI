@@ -6,7 +6,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.database import SessionLocal
-from app.models import Endpoint, RequestMetric
+from app.models import Endpoint, RequestMetric, Service
 from app.schemas.metric import MetricCreate, MetricResponse
 import math
 
@@ -72,6 +72,116 @@ def create_metric(
     db.refresh(new_metric)
 
     return new_metric
+
+
+@router.get("/global")
+def get_global_metrics(
+    minutes: int = Query(
+        60,
+        ge=1,
+        le=10080
+    ),
+    db: Session = Depends(get_db)
+):
+
+    # Calculate time window
+    start_time = datetime.now(timezone.utc) - timedelta(
+        minutes=minutes
+    )
+
+    # Get all metrics in the selected time window
+    metrics = (
+        db.query(RequestMetric)
+        .filter(
+            RequestMetric.timestamp >= start_time
+        )
+    )
+
+    # Get all latency values
+    latency_values = [
+        metric.latency_ms
+        for metric in metrics.all()
+    ]
+
+    # Total requests
+    total_requests = len(latency_values)
+
+    # Average latency
+    if total_requests > 0:
+        average_latency = (
+            sum(latency_values) / total_requests
+        )
+    else:
+        average_latency = 0
+
+    # P95 latency
+    p95_latency = calculate_percentile(
+        latency_values,
+        95
+    )
+
+    # P99 latency
+    p99_latency = calculate_percentile(
+        latency_values,
+        99
+    )
+
+    # Error count
+    error_count = (
+        db.query(RequestMetric)
+        .filter(
+            RequestMetric.timestamp >= start_time,
+            RequestMetric.status_code >= 400
+        )
+        .count()
+    )
+
+    # Error rate
+    if total_requests > 0:
+        error_rate = (
+            error_count / total_requests
+        ) * 100
+    else:
+        error_rate = 0
+
+    # Service count
+    service_count = (
+        db.query(Service)
+        .count()
+    )
+
+    # Endpoint count
+    endpoint_count = (
+        db.query(Endpoint)
+        .count()
+    )
+
+    return {
+        "time_window_minutes": minutes,
+
+        "total_requests": total_requests,
+
+        "average_latency_ms": round(
+            average_latency,
+            2
+        ),
+
+        "p95_latency_ms": p95_latency,
+
+        "p99_latency_ms": p99_latency,
+
+        "error_count": error_count,
+
+        "error_rate": round(
+            error_rate,
+            2
+        ),
+
+        "service_count": service_count,
+
+        "endpoint_count": endpoint_count
+    }
+    
 
 @router.get("/{endpoint_id}", response_model=list[MetricResponse])
 def get_endpoint_metrics(
@@ -201,4 +311,7 @@ def get_endpoint_stats(
         2
     )
 }
+    
+
+
 

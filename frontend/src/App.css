@@ -2252,3 +2252,630 @@ body {
   font-size: 11px;
   text-align: right;
 }
+
+/* =========================
+   ENDPOINTS PAGE
+========================= */
+
+.endpoints-page {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 10px 0 40px;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.endpoints-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+
+  margin-bottom: 28px;
+}
+
+.endpoints-page-header h1 {
+  margin: 8px 0 6px;
+
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.2;
+
+  color: #f5f5f5;
+}
+
+.endpoints-subtitle {
+  margin: 0;
+
+  font-size: 13px;
+  font-weight: 400;
+
+  color: #777;
+}
+
+
+/* =========================
+   ENDPOINT COUNT
+========================= */
+
+.endpoints-count {
+  padding: 9px 14px;
+
+  border: 1px solid #292929;
+  border-radius: 8px;
+
+  background: #111;
+
+  color: #a855f7;
+
+  font-size: 12px;
+  font-weight: 500;
+}
+
+
+/* =========================
+   ENDPOINT LIST
+========================= */
+
+.endpoints-list {
+  display: flex;
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+
+/* =========================
+   ENDPOINT CARD
+========================= */
+
+.endpoint-card {
+  display: grid;
+
+  grid-template-columns:
+    auto
+    minmax(220px, 1fr)
+    auto
+    auto;
+
+  align-items: center;
+
+  gap: 24px;
+
+  padding: 18px 20px;
+
+  background: #111;
+  border: 1px solid #262626;
+  border-radius: 10px;
+
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.endpoint-card:hover {
+  border-color: #a855f7;
+
+  background: #141414;
+
+  transform: translateY(-2px);
+}
+
+
+/* =========================
+   HTTP METHOD BADGE
+========================= */
+
+.endpoint-method-badge {
+  min-width: 58px;
+
+  padding: 7px 9px;
+
+  border-radius: 6px;
+
+  text-align: center;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  letter-spacing: 0.5px;
+}
+
+
+/* GET */
+
+.endpoint-method-badge.get {
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.1);
+
+  border: 1px solid rgba(74, 222, 128, 0.25);
+}
+
+
+/* POST */
+
+.endpoint-method-badge.post {
+  color: #60a5fa;
+  background: rgba(96, 165, 250, 0.1);
+
+  border: 1px solid rgba(96, 165, 250, 0.25);
+}
+
+
+/* PUT */
+
+.endpoint-method-badge.put {
+  color: #facc15;
+  background: rgba(250, 204, 21, 0.1);
+
+  border: 1px solid rgba(250, 204, 21, 0.25);
+}
+
+
+/* DELETE */
+
+.endpoint-method-badge.delete {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.1);
+
+  border: 1px solid rgba(248, 113, 113, 0.25);
+}
+
+
+/* =========================
+   ENDPOINT INFORMATION
+========================= */
+
+.endpoint-card-info h2 {
+  margin: 0 0 4px;
+
+  color: #f5f5f5;
+
+  font-size: 15px;
+  font-weight: 500;
+
+  line-height: 1.4;
+}
+
+.endpoint-card-info p {
+  margin: 0;
+
+  color: #666;
+
+  font-size: 11px;
+  font-weight: 400;
+}
+
+
+/* =========================
+   METADATA
+========================= */
+
+.endpoint-card-meta {
+  display: flex;
+
+  gap: 24px;
+}
+
+.endpoint-meta-item {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.endpoint-meta-item span {
+  font-size: 9px;
+
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+
+  color: #666;
+}
+
+.endpoint-meta-item strong {
+  font-size: 12px;
+  font-weight: 500;
+
+  color: #ddd;
+}
+
+
+/* =========================
+   VIEW BUTTON
+========================= */
+
+.view-endpoint-btn {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 9px 14px;
+
+  background: transparent;
+
+  border: 1px solid #333;
+  border-radius: 7px;
+
+  color: #ddd;
+
+  font-size: 11px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.view-endpoint-btn:hover {
+  background: #a855f7;
+
+  border-color: #a855f7;
+
+  color: white;
+}
+
+.view-endpoint-btn span {
+  font-size: 14px;
+
+  transition: transform 0.2s ease;
+}
+
+.view-endpoint-btn:hover span {
+  transform: translateX(3px);
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+
+  .endpoint-card {
+    grid-template-columns:
+      auto
+      1fr;
+
+    gap: 18px;
+  }
+
+  .endpoint-card-meta {
+    grid-column: 2;
+
+    gap: 20px;
+  }
+
+  .view-endpoint-btn {
+    grid-column: 2;
+
+    width: fit-content;
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .endpoints-page-header {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 16px;
+  }
+
+  .endpoint-card {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+  .endpoint-card-meta {
+    width: 100%;
+
+    gap: 20px;
+  }
+
+  .view-endpoint-btn {
+    width: 100%;
+  }
+
+}
+
+
+
+/* =========================
+   GLOBAL METRICS PAGE
+========================= */
+
+.metrics-page {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 10px 0 50px;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.metrics-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+
+  gap: 30px;
+  margin-bottom: 20px;
+}
+
+.metrics-page-header h1 {
+  margin: 10px 0 8px;
+
+  font-size: 32px;
+  font-weight: 700;
+
+  color: #f5f5f5;
+}
+
+.metrics-subtitle {
+  margin: 0;
+
+  font-size: 14px;
+  color: #777;
+}
+
+
+/* =========================
+   TIME CONTROLS
+========================= */
+
+.metrics-time-controls {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 5px;
+
+  background: #111;
+
+  border: 1px solid #292929;
+  border-radius: 9px;
+}
+
+.metrics-time-controls button {
+  padding: 8px 12px;
+
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+
+  color: #777;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.metrics-time-controls button:hover {
+  color: #ddd;
+}
+
+.metrics-time-controls button.active {
+  background: #a855f7;
+  color: white;
+}
+
+
+/* =========================
+   TIME WINDOW
+========================= */
+
+.global-metrics-window {
+  display: inline-block;
+
+  margin-bottom: 32px;
+
+  padding: 8px 13px;
+
+  background: #111;
+
+  border: 1px solid #292929;
+  border-radius: 7px;
+
+  color: #888;
+
+  font-size: 12px;
+}
+
+
+/* =========================
+   METRIC SECTIONS
+========================= */
+
+.global-metrics-section {
+  margin-bottom: 42px;
+}
+
+.global-section-header {
+  margin-bottom: 18px;
+}
+
+.global-section-header h2 {
+  margin: 6px 0;
+
+  color: #f5f5f5;
+
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.global-section-header p {
+  margin: 0;
+
+  color: #777;
+
+  font-size: 13px;
+}
+
+
+/* =========================
+   METRICS GRID
+========================= */
+
+.global-metrics-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 16px;
+}
+
+
+/* Smaller two-card grids */
+
+.reliability-grid {
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  max-width: 700px;
+}
+
+
+/* =========================
+   METRIC CARD
+========================= */
+
+.global-metric-card {
+  min-height: 155px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  padding: 22px;
+
+  background: #111;
+
+  border: 1px solid #262626;
+  border-radius: 12px;
+
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.global-metric-card:hover {
+  border-color: #a855f7;
+
+  background: #141414;
+
+  transform: translateY(-2px);
+}
+
+.global-metric-card > span {
+  margin-bottom: 12px;
+
+  color: #777;
+
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.global-metric-card strong {
+  color: #f5f5f5;
+
+  font-size: 28px;
+  font-weight: 650;
+
+  line-height: 1.1;
+}
+
+.global-metric-card strong small {
+  color: #888;
+
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.global-metric-card p {
+  margin: 12px 0 0;
+
+  color: #666;
+
+  font-size: 12px;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1100px) {
+
+  .global-metrics-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+
+@media (max-width: 700px) {
+
+  .metrics-page-header {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 20px;
+  }
+
+  .global-metrics-grid,
+  .reliability-grid {
+    grid-template-columns: 1fr;
+
+    max-width: none;
+  }
+
+}
+
+
+@media (max-width: 500px) {
+
+  .metrics-page-header h1 {
+    font-size: 28px;
+  }
+
+  .metrics-time-controls {
+    width: 100%;
+
+    justify-content: space-between;
+  }
+
+  .metrics-time-controls button {
+    flex: 1;
+  }
+
+}

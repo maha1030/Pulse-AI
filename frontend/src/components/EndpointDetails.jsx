@@ -686,4 +686,3 @@ function EndpointDetails({
 }
 
 export default EndpointDetails;
-

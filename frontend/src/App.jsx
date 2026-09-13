@@ -14,6 +14,8 @@ import StatsCard from "./components/StatsCard";
 import Services from "./components/Services";
 import ServiceDetails from "./components/ServiceDetails";
 import EndpointDetails from "./components/EndpointDetails";
+import Endpoints from "./components/Endpoints";
+import Metrics from "./components/Metrics";
 
 import "./App.css";
 
@@ -462,22 +464,17 @@ function App() {
         )}
 
         {currentPage === "endpoints" && (
-
-          <div className="coming-soon">
-            <h2>Endpoints</h2>
-            <p>Endpoint monitoring will be available here.</p>
-          </div>
-
+          <Endpoints
+            onViewEndpoint={(endpointId) => {
+              setSelectedEndpointId(endpointId);
+              setCurrentPage("endpoint-details");
+            }}
+          />
         )}
 
 
         {currentPage === "metrics" && (
-
-          <div className="coming-soon">
-            <h2>Metrics</h2>
-            <p>Detailed metrics will be available here.</p>
-          </div>
-
+          <Metrics />
         )}
 
       </main>

@@ -47,3 +47,11 @@ def create_endpoint(
     db.refresh(new_endpoint)
 
     return new_endpoint
+
+@router.get("/", response_model=list[EndpointResponse])
+def get_endpoints(
+    db: Session = Depends(get_db)
+):
+    endpoints = db.query(Endpoint).all()
+
+    return endpoints
