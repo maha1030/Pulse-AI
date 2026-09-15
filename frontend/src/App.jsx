@@ -16,6 +16,8 @@ import ServiceDetails from "./components/ServiceDetails";
 import EndpointDetails from "./components/EndpointDetails";
 import Endpoints from "./components/Endpoints";
 import Metrics from "./components/Metrics";
+import CreateProject from "./components/CreateProject";
+import CreateService from "./components/CreateService";
 
 import "./App.css";
 
@@ -29,6 +31,9 @@ function App() {
   const [selectedServiceId, setSelectedServiceId] = useState(null);
   const [selectedEndpointId, setSelectedEndpointId] = useState(null);
   const [metrics, setMetrics] = useState([]);
+  const [showCreateProject, setShowCreateProject] = useState(false);
+  const [currentProjectId, setCurrentProjectId] = useState(1);
+  const [showCreateService, setShowCreateService] = useState(false);
 
 
   // =========================
@@ -67,7 +72,7 @@ function App() {
   useEffect(() => {
 
     fetch(
-      "http://127.0.0.1:8000/projects/1/stats?minutes=60"
+      `http://127.0.0.1:8000/projects/${currentProjectId}/stats?minutes=60`
     )
 
       .then((response) => {
@@ -88,7 +93,7 @@ function App() {
         console.error("Error fetching stats:", error);
       });
 
-  }, []);
+  }, [currentProjectId]);
 
 
   useEffect(() => {
@@ -161,8 +166,47 @@ function App() {
 
               </div>
 
-            </header>
 
+              <div className="dashboard-header-actions">
+
+                <select
+                  className="project-selector"
+                  value={currentProjectId}
+                  onChange={(event) =>
+                    setCurrentProjectId(Number(event.target.value))
+                  }
+                >
+
+                  {projects.map((project) => (
+                    <option
+                      key={project.id}
+                      value={project.id}
+                    >
+                      {project.name}
+                    </option>
+                  ))}
+
+                </select>
+
+
+                <button
+                  className="create-service-btn"
+                  onClick={() => setShowCreateService(true)}
+                >
+                  + Add Service
+                </button>
+
+
+                <button
+                  className="create-project-btn"
+                  onClick={() => setShowCreateProject(true)}
+                >
+                  + New Project
+                </button>
+
+              </div>
+
+            </header>
 
             {/* =========================
                 STATISTICS
@@ -478,6 +522,29 @@ function App() {
         )}
 
       </main>
+      {showCreateProject && (
+        <CreateProject
+          onClose={() => setShowCreateProject(false)}
+          onProjectCreated={(newProject) => {
+            setProjects((currentProjects) => [
+              ...currentProjects,
+              newProject,
+            ]);
+
+            setCurrentProjectId(newProject.id);
+          }}
+        />
+      )}
+
+      {showCreateService && (
+        <CreateService
+          projectId={currentProjectId}
+          onClose={() => setShowCreateService(false)}
+          onServiceCreated={(newService) => {
+            console.log("Service created:", newService);
+          }}
+        />
+      )}
 
     </div>
   );

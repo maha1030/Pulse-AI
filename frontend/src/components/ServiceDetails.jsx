@@ -1,11 +1,13 @@
-
 import { useEffect, useState } from "react";
+import CreateEndpoint from "./CreateEndpoint";
 
 function ServiceDetails({ serviceId, onBack, onViewEndpoint }) {
 
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showCreateEndpoint, setShowCreateEndpoint] =
+  useState(false);
 
 
   useEffect(() => {
@@ -178,19 +180,7 @@ function ServiceDetails({ serviceId, onBack, onViewEndpoint }) {
 
       <section className="endpoints-section">
 
-        <div className="endpoints-header">
-
-          <div>
-
-            <h2>
-              Endpoints
-            </h2>
-
-            <p>
-              API endpoints exposed by this service.
-            </p>
-
-          </div>
+        <div className="endpoints-header-actions">
 
           <span className="endpoint-count">
             {service.endpoints.length}{" "}
@@ -199,8 +189,14 @@ function ServiceDetails({ serviceId, onBack, onViewEndpoint }) {
               : "Endpoints"}
           </span>
 
-        </div>
+          <button
+            className="create-endpoint-btn"
+            onClick={() => setShowCreateEndpoint(true)}
+          >
+            + Add Endpoint
+          </button>
 
+        </div>
 
         {service.endpoints.length === 0 ? (
 
@@ -250,7 +246,21 @@ function ServiceDetails({ serviceId, onBack, onViewEndpoint }) {
         )}
 
       </section>
-
+       {showCreateEndpoint && (
+          <CreateEndpoint
+            serviceId={service.id}
+            onClose={() => setShowCreateEndpoint(false)}
+            onEndpointCreated={(newEndpoint) => {
+              setService((currentService) => ({
+                ...currentService,
+                endpoints: [
+                  ...currentService.endpoints,
+                  newEndpoint,
+                ],
+              }));
+            }}
+          />
+        )}
     </div>
 
   );
